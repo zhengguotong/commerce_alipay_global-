@@ -1,0 +1,7 @@
+<?php
+/**
+* @file
+ * @author Guotong Zheng (Tony)
+ * @website zhengguotong.me
+* Implements Alipay global payment services for use with Drupal Commerce
+*/
