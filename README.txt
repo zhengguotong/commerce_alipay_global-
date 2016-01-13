@@ -2,6 +2,8 @@ Commerce Alipay Global
 
 Developer: Guotong Zheng (Tony)
 Developer Website:http://zhengguotong.me
+
+This Module is base on Drupal Module [Commerce Alipay] (https://www.drupal.org/project/commerce_alipay)
 ===============
 
 Implements [Alipay Global](http://global.alipay.com/) payment services for use with
