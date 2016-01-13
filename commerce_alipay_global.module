@@ -2,6 +2,124 @@
 /**
 * @file
  * @author Guotong Zheng (Tony)
- * @website zhengguotong.me
+ * @website http://zhengguotong.me
 * Implements Alipay global payment services for use with Drupal Commerce
 */
+
+/**
+ * Implements hook_commerce_payment_method_info().
+ */
+function commerce_alipay_global_commerce_payment_method_info() {
+    $payment_methods = array();
+
+    // Declare Alipay payment method to redirect to external site.
+    $payment_methods['alipay_global'] = array(
+        'base' => 'commerce_alipay_global',
+        'title' => t('Alipay Global'),
+        'terminal' => FALSE,
+        'offsite' => TRUE,
+        'offsite_autoredirect' => TRUE,
+    );
+
+    return $payment_methods;
+}
+
+/**
+ * Payment method callback: settings form.
+ */
+function commerce_alipay_global_settings_form($settings = NULL) {
+    $form = array();
+
+    $settings = (array) $settings + array(
+            'service' => 'create_forex_trade',
+            'seller_email' => '',
+            'partner' => '',
+            'key' => '',
+            'debug' => '',
+        );
+    // Declare form settings to configure the Alipay payment method.
+    $form['service'] = array(
+        '#type' => 'select',
+        '#title' => t('Payment service type'),
+        '#prefix' => t("Configure Alipay payment settings below with the corresponding account information.<br/>If you do not already have an account feel free to create a new merchant account at <a href='@link_alipayreg'>Alipay's Enterprise account registration</a> page.<br/>More help could be found on the official website at: <a href='@link_alipayhelp'>How to create a new enterprise account on Alipay's website</a> <em>(Chinese version)</em>.", array('@link_alipayreg' => 'https://memberprod.alipay.com/account/reg/enterpriseIndex.htm', '@link_alipayhelp' => 'http://help.alipay.com/lab/help_detail.htm?help_id=211702')),
+        '#description' => t('Select the type of service provided by Alipay to process payments.<br/><strong>Currently only Instant Payment is fully supported.</strong>'),
+        '#default_value' => $settings['service'],
+        '#options' => array(
+            'create_forex_trade' => t('Globlal')
+        ),
+        '#required' => TRUE,
+    );
+    // Seller email should be an email address format.
+    $form['seller_email'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Seller email'),
+        '#description' => t('The seller email with which the Alipay account was registered for the corresponding type of service.'),
+        '#default_value' => $settings['seller_email'],
+        '#required' => TRUE,
+    );
+    // Partner ID should be long string.
+    $form['partner'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Partner ID'),
+        '#description' => t("The Partner ID of the Alipay account on which payments should be credited."),
+        '#default_value' => $settings['partner'],
+        '#required' => TRUE,
+    );
+    // Alipay Key should be long string.
+    $form['key'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Key'),
+        '#description' => t("The Key code provided by Alipay's API for the corresponding account and type of service."),
+        '#default_value' => $settings['key'],
+        '#required' => TRUE,
+    );
+    // Enable debug mode.
+    $form['debug'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable debug mode <strong>(for development use only)</strong>'),
+        '#description' => t('<strong>Override all transactions to a total of 0.01 CNY</strong> for testing the configuration and making sure that payments can be received on the correct account.<br/>This setting should only be used for development purposes.'),
+        '#default_value' => $settings['debug'],
+    );
+
+    return $form;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Modify the payment method selection pane on Checkout to add Alipay icons.
+ */
+function commerce_alipay_global_form_commerce_checkout_form_alter(&$form, &$form_state)
+{
+    // If this checkout form contains the payment method radios...
+    if (!empty($form['commerce_payment']['payment_method']['#options'])) {
+        // Loop over its options array looking for a Alipay option.
+        foreach ($form['commerce_payment']['payment_method']['#options'] as $key => &$value) {
+            list($method_id, $rule_name) = explode('|', $key);
+
+            // If we find Alipay...
+            if ($method_id == 'alipay_global') {
+                // Prepare the replacement radio button text with icons.
+                $icons_path = drupal_get_path('module', 'commerce_alipay_global') . '/images/';
+
+                // Generate Alipay logo image markup.
+                $alipay_label = t('Alipay');
+                $alipay_icon = theme('image', array(
+                    'path' => $icons_path . 'alipay.jpg',
+                    'title' => $alipay_label,
+                    'alt' => $alipay_label,
+                    'attributes' => array('class' => 'commerce-alipay-icon'),
+                ));
+
+                // Generate the aggregated markup.
+                $value = $alipay_icon . '<span class="commerce-alipay-label">' . $alipay_label . '</span>';
+//                $value .= '<div class="commerce-alipay-directpay">' . $directpay_icon . '<span class="commerce-alipay-label">' . $directpay_label . '</span></div>';
+
+                // Add module's CSS for the custom labels styles.
+                $form['commerce_payment']['payment_method']['#attached']['css'][] = drupal_get_path('module', 'commerce_alipay') . '/theme/commerce_alipay.theme.css';
+
+                break;
+            }
+        }
+    }
+}

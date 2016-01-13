@@ -1,7 +1,7 @@
 Commerce Alipay Global
 
 Developer: Guotong Zheng (Tony)
-Developer Website:zhengguotong.me
+Developer Website:http://zhengguotong.me
 ===============
 
 Implements [Alipay Global](http://global.alipay.com/) payment services for use with
