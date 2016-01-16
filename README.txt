@@ -3,7 +3,7 @@ Commerce Alipay Global
 Developer: Guotong Zheng (Tony)
 Developer Website:http://zhengguotong.me
 
-This Module is base on Drupal Module [Commerce Alipay] (https://www.drupal.org/project/commerce_alipay)
+This Module is based on Drupal Module [Commerce Alipay] (https://www.drupal.org/project/commerce_alipay)
 ===============
 
 Implements [Alipay Global](http://global.alipay.com/) payment services for use with
@@ -54,17 +54,3 @@ http://help.alipay.com/support/232511-16307/0-16307.htm?sh=Y&info_type=9
 3 - Alipay Forum:
 http://club.alipay.com/read-htm-tid-8681712.html
 4 - Alipay's Hotline: 0571-88158090 (Monday - Friday, 9:00 to 18:00)
-
-
-Bugs/Features/Patches
----------------------
-If you would like to report bugs, feature requests, or submit a patch, please
-do so in the project's issue tracker at:
-https://drupal.org/project/issues/commerce_alipay
-
-
-Contributions are welcome!!
----------------------------
-Feel free to follow up in the issue queue for any contributions, 
-bug reports, feature requests.
-Tests, feedback or comments in general are highly appreciated.
