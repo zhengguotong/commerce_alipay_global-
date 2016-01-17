@@ -88,6 +88,27 @@ function commerce_alipay_global_settings_form($settings = NULL) {
         '#default_value' => $settings['key'],
         '#required' => TRUE,
     );
+
+    // Alipay Key should be long string.
+    $form['currency'] = array(
+        '#type' => 'select',
+        '#title' => t('Select a target  foreign currency'),
+        '#description' => t("Alipay will  remit the sum in selected foreign currency to the international merchant in settlement."),
+        '#default_value' => $settings['currency'],
+        '#options' => array(
+            'GBP' => t('British Sterling'),
+            'HKD' => t('Hong Kong Dollar'),
+            'USD' => t('U.S. Dollar'),
+            'SGD' => t('Singapore Dollar'),
+            'JPY' => t('Japanese Yen'),
+            'CAD' => t('Canada Dollar'),
+            'AUD' => t('Australian Dollar'),
+            'EUR' => t('Euro'),
+            'NZD' => t('New Zealand Dollar'),
+            'RUB' => t('Russian Rouble')
+        ),
+        '#required' => TRUE,
+    );
     // Enable debug mode.
     $form['debug'] = array(
         '#type' => 'checkbox',
@@ -166,9 +187,9 @@ function commerce_alipay_global_redirect_form($form, &$form_state, $order, $paym
     $wrapper = entity_metadata_wrapper('commerce_order', $order);
     $currency_code = $wrapper->commerce_order_total->currency_code->value();
 
-
     // Override transaction amount if debug mode is enabled.
     $amount = $payment_method['settings']['debug'] ? 1 : $wrapper->commerce_order_total->amount->value();
+    $amount = commerce_currency_amount_to_decimal($amount, $currency_code);
 
     // Set feedback URLs.
     $settings = array(
@@ -177,6 +198,8 @@ function commerce_alipay_global_redirect_form($form, &$form_state, $order, $paym
         'notify' => url('commerce_alipay_global/notify', array('absolute' => TRUE)),
     );
     $settings = $payment_method['settings'] + $settings;
+
+    $target_currency_code =  $settings['currency'];
 
     // Declare the data to be provided through Alipay's API to process payment.
     $data = array(
@@ -191,8 +214,8 @@ function commerce_alipay_global_redirect_form($form, &$form_state, $order, $paym
         'out_trade_no' => $order->order_number,
         'subject' => t('order !order_id', array('!order_id' => $order->order_number)),
         'body' => commerce_alipay_global_data_body($order),
-        'total_fee' => commerce_currency_amount_to_decimal($amount, 'CNY'),
-        'currency' => $currency_code,
+        'total_fee' =>round(commerce_multicurrency_conversion($amount,$currency_code, $target_currency_code),2),
+        'currency' => $target_currency_code,
         'sign_type' => 'MD5',
     );
     // Encrypted transaction signature.
