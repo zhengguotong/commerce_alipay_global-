@@ -12,7 +12,7 @@
 function commerce_alipay_global_menu() {
     // Add a menu callback for Alipay's notification on operation processing.
     $items['commerce_alipay_global/notify'] = array(
-        'page callback' => 'commerce_alipay_process_notify',
+        'page callback' => 'commerce_alipay_global_process_notify',
         'access callback' => TRUE,
         'type' => MENU_CALLBACK,
     );
@@ -302,9 +302,12 @@ function commerce_alipay_global_notify_submit($order, $payment_method, $notify) 
         $transaction = commerce_payment_transaction_new($payment_method['method_id'], $order->order_id);
         $transaction->instance_id = $payment_method['instance_id'];
     }
-    // Currently supports only transactions in CNY.
-    $transaction->amount = commerce_currency_decimal_to_amount($notify['total_fee'], 'CNY');
-    $transaction->currency_code = 'CNY';
+
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $currency_code = $wrapper->commerce_order_total->currency_code->value();
+
+    $transaction->amount = commerce_currency_decimal_to_amount($notify['total_fee'], $currency_code);
+    $transaction->currency_code = $currency_code;
 
     $transaction->remote_id = $notify["trade_no"];
     // Set the transaction's statuses based on notify's trade_status.
