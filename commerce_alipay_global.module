@@ -1,10 +1,10 @@
 <?php
 /**
-* @file
+ * @file
  * @author Guotong Zheng (Tony)
  * @website http://zhengguotong.me
-* Implements Alipay global payment services for use with Drupal Commerce
-*/
+ * Implements Alipay global payment services for use with Drupal Commerce
+ */
 
 /**
  * Implements hook_menu().
@@ -413,7 +413,13 @@ function commerce_alipay_global_data_body($order) {
                 $body[] = $line_item_wrapper->commerce_product->title->value();
             }
         }
-        return implode($body, ' | ');
+        $body = implode($body, ' | ');
+
+        if(strlen( $body) >= 100){//make sure body length does not over alipay boby length limit
+            $body = substr($body,0,100) . '...';
+        }
+
+        return $body;
     }
 }
 
@@ -467,5 +473,3 @@ function commerce_alipay_global_status_message($status) {
             return t('The payment has completed.');
     }
 }
-
-
