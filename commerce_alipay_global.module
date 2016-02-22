@@ -369,7 +369,7 @@ function commerce_alipay_global_notify_submit($order, $payment_method, $notify) 
                 $transaction->message = commerce_alipay_global_status_message($notify['trade_status']);
                 // No need to change order status when Instant Payment is successful.
                 if ($notify['exterface']!= "create_direct_pay_by_user") {
-                    commerce_order_status_update($order, 'completed');
+                    commerce_checkout_complete($order);
                 }
                 break;
 
@@ -379,7 +379,7 @@ function commerce_alipay_global_notify_submit($order, $payment_method, $notify) 
                 $transaction->message = commerce_alipay_global_status_message($notify['trade_status']);
                 // No need to change order status when Instant Payment is successful.
                 if ($notify['exterface']!= "create_direct_pay_by_user") {
-                    commerce_order_status_update($order, 'completed');
+                    commerce_checkout_complete($order);
                 }
                 break;
         }
