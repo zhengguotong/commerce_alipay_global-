@@ -47,7 +47,6 @@ function commerce_alipay_global_settings_form($settings = NULL) {
 
     $settings = (array) $settings + array(
             'service' => 'create_forex_trade',
-            'seller_email' => '',
             'partner' => '',
             'key' => '',
             'debug' => '',
@@ -60,18 +59,12 @@ function commerce_alipay_global_settings_form($settings = NULL) {
         '#description' => t('Select the type of service provided by Alipay to process payments.<br/><strong>Currently only Instant Payment is fully supported.</strong>'),
         '#default_value' => $settings['service'],
         '#options' => array(
-            'create_forex_trade' => t('Globlal')
+            'create_forex_trade' => t('Cross-border Website Payment'),
+            'create_forex_trade_wap' => t('Cross-border Mobile Payment'),
         ),
         '#required' => TRUE,
     );
-    // Seller email should be an email address format.
-    $form['seller_email'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Seller email'),
-        '#description' => t('The seller email with which the Alipay account was registered for the corresponding type of service.'),
-        '#default_value' => $settings['seller_email'],
-        '#required' => TRUE,
-    );
+
     // Partner ID should be long string.
     $form['partner'] = array(
         '#type' => 'textfield',
@@ -206,7 +199,6 @@ function commerce_alipay_global_redirect_form($form, &$form_state, $order, $paym
         'service' => $settings['service'],
         'payment_type' => '1',
         'partner' => $settings['partner'],
-        'seller_email' => $settings['seller_email'],
         'return_url' => $settings['return'],
         'notify_url' => $settings['notify'],
         '_input_charset' => 'UTF-8',
